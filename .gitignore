@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.coverage
+__pycache__/
+*.pyc
+*.db
+*.db-shm
+*.db-wal
+node_modules/
+dist/
+target/
+runtime/
+preview/generated-pairs.js
+preview/*.png
+preview/*.jpg
