@@ -90,6 +90,18 @@ class GenerationTests(unittest.TestCase):
             records = [json.loads(line) for line in receipt.read_text().splitlines()]
             self.assertEqual([record["status"] for record in records], ["validated", "failed"])
 
+    def test_batch_randomizes_model_positions_without_attribution(self):
+        with tempfile.TemporaryDirectory() as directory:
+            def distinct(key, model, word):
+                response = completion(model, word)
+                response['choices'][0]['message']['content'] = f'{word} joke number {generation.MODELS.index(model)}'
+                return response
+            for reverse in [0, 1]:
+                with patch.object(generation, 'request_completion', side_effect=distinct), patch.object(generation.secrets, 'randbelow', return_value=reverse):
+                    pairs, _ = generation.generate('test-secret', ['coffee'], Path(directory)/f'receipt-{reverse}.jsonl')
+                expected = ['coffee joke number 0', 'coffee joke number 1']
+                self.assertEqual(pairs[0]['jokes'], expected[::-1] if reverse else expected)
+
     def test_invalid_batches_make_no_paid_calls(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(generation, "request_completion") as transport:
             receipt = Path(directory) / "receipt.jsonl"

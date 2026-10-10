@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Repository-specific forced SSH command: deploy one immutable Jokes Arena image."""
 import fcntl
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -26,7 +27,7 @@ def run(command, **kwargs):
 
 
 def backup(database, destination):
-    with sqlite3.connect(f'file:{database}?mode=ro', uri=True) as source, sqlite3.connect(destination) as target:
+    with closing(sqlite3.connect(f'file:{database}?mode=ro', uri=True)) as source, closing(sqlite3.connect(destination)) as target:
         source.backup(target)
         if target.execute('PRAGMA quick_check').fetchone()[0] != 'ok':
             raise RuntimeError('SQLite backup integrity check failed')
