@@ -1,7 +1,7 @@
 services:
   arena:
     image: ${ARENA_IMAGE:?Set an immutable image digest}
-    user: "1000:1000"
+    user: "${ARENA_UID:?Set the host user UID}:${ARENA_GID:?Set the host group GID}"
     ports:
       - "127.0.0.1:8183:8080"
     environment:

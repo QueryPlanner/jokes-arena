@@ -2,7 +2,8 @@
 
 The production image contains the frontend and Python REST service. Gunicorn
 serves both on port 8080. Caddy forwards `jokesarena.lordpatil.com` to
-`127.0.0.1:8183`. Compose runs as UID 1000 and stores SQLite in `./data/arena.db`.
+`127.0.0.1:8183`. Both containers run as the host deployment user and group.
+SQLite stays in `./data/arena.db`; its private directory stays owned by that user.
 The app does not need an OpenRouter key to serve the pre-generated pool.
 
 ## Delivery flow

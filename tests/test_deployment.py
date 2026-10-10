@@ -83,7 +83,7 @@ class DeploymentTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'wrong revision'):
                 deploy.deploy(self.root,DIGEST,REVISION)
         self.assertEqual(json.loads((self.root/'current.json').read_text()),previous)
-        self.assertEqual((self.root/'image.env').read_text(),f'ARENA_IMAGE={OLD_IMAGE}\n')
+        self.assertEqual((self.root/'image.env').read_text(),f'ARENA_IMAGE={OLD_IMAGE}\nARENA_UID={os.getuid()}\nARENA_GID={os.getgid()}\n')
         self.assertEqual([call.args[0] for call in ready.call_args_list],[REVISION,OLD_REVISION])
         self.assertTrue(self.store.has_session('existing-session'))
 
@@ -109,6 +109,15 @@ class DeploymentTests(unittest.TestCase):
                 with self.assertRaises(RuntimeError): deploy.deploy(self.root,DIGEST,REVISION)
             self.assertFalse((self.root/'current.json').exists())
             self.assertFalse((self.root/'backups').exists())
+
+    def test_seed_and_service_use_actual_host_identity(self):
+        self.database.unlink()
+        seed=self.root/'seed/receipt.jsonl';seed.parent.mkdir();seed.write_text('private fixture')
+        with patch.object(deploy,'run',side_effect=self.command), patch.object(deploy,'wait_ready'), patch.object(deploy.os,'getuid',return_value=2000), patch.object(deploy.os,'getgid',return_value=2001):
+            deploy.deploy(self.root,DIGEST,REVISION)
+        self.assertEqual((self.root/'image.env').read_text(),f'ARENA_IMAGE={deploy.IMAGE}@{DIGEST}\nARENA_UID=2000\nARENA_GID=2001\n')
+        seed_command=next(args for args,_ in self.calls if 'arena.seed' in args)
+        self.assertEqual(seed_command[seed_command.index('--user')+1], '2000:2001')
 
     def test_readiness_rejects_wrong_revision_empty_pool_and_network_errors(self):
         responses=[URLError('offline'),OSError('unavailable'),io.StringIO('invalid json'),

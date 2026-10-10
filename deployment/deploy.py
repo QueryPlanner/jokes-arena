@@ -49,7 +49,7 @@ def wait_ready(revision, attempts=30):
 
 def start(root, image):
     temporary = root / 'image.env.new'
-    temporary.write_text(f'ARENA_IMAGE={image}\n')
+    temporary.write_text(f'ARENA_IMAGE={image}\nARENA_UID={os.getuid()}\nARENA_GID={os.getgid()}\n')
     temporary.replace(root / 'image.env')
     run(['docker', 'compose', '--project-name', 'jokes-arena', '--env-file', str(root / 'image.env'),
          '--file', str(root / 'compose.yaml'), 'up', '--detach', '--pull', 'never', '--wait', '--wait-timeout', '90'])
@@ -82,7 +82,7 @@ def deploy(root, digest, revision, token=''):
             receipt = root / 'seed/receipt.jsonl'
             if not receipt.is_file():
                 raise RuntimeError('First deployment requires the private validated seed receipt')
-            run(['docker', 'run', '--rm', '--network', 'none', '--read-only', '--cap-drop', 'ALL',
+            run(['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}', '--read-only', '--cap-drop', 'ALL',
                  '--security-opt', 'no-new-privileges:true', '--mount', f'type=bind,src={data},dst=/data',
                  '--mount', f'type=bind,src={receipt},dst=/seed/receipt.jsonl,readonly', image,
                  'python', '-m', 'arena.seed', '--database', '/data/arena.db', '--receipt', '/seed/receipt.jsonl'])
