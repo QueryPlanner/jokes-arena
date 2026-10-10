@@ -1,0 +1,11 @@
+*
+!arena/
+!arena/*.py
+!config/
+!config/*.json
+!preview/
+!preview/index.html
+!preview/styles.css
+!preview/app.js
+!requirements.txt
+!Dockerfile

@@ -1,0 +1,12 @@
+jokesarena.lordpatil.com {
+    encode zstd gzip
+    request_body {
+        max_size 4KB
+    }
+    reverse_proxy 127.0.0.1:8183 {
+        transport http {
+            dial_timeout 3s
+            response_header_timeout 20s
+        }
+    }
+}

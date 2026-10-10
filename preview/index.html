@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jokes Arena</title>
+  <link rel="stylesheet" href="/preview/styles.css">
+  <script src="/preview/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="/preview/">Jokes Arena<span>Two models. One word. Your call.</span></a>
+    <nav aria-label="Main"><button id="battle-tab" class="nav-button active" aria-current="page">Battle</button><button id="leaderboard-tab" class="nav-button">Leaderboard</button></nav>
+  </header>
+  <main>
+    <section id="battle-view" aria-labelledby="battle-title">
+      <div class="intro"><p class="eyebrow">THE HUMOR TEST</p><h1 id="battle-title">Which joke is funnier?</h1><p>Both models get the same word. Pick the joke that makes you laugh.</p></div>
+      <div id="round-info" class="round-info"><span>Shared word <strong id="word">—</strong></span><span id="model-visibility">Models revealed after you choose</span></div>
+      <div id="cards" class="cards" aria-busy="true">
+        <button class="joke-card" id="left-card" disabled><span class="model-name" id="left-model" hidden></span><span class="joke-text" id="left-joke">Loading a pair…</span><span class="card-action" id="left-action">Choose this joke</span></button>
+        <button class="joke-card" id="right-card" disabled><span class="model-name" id="right-model" hidden></span><span class="joke-text" id="right-joke">Loading a pair…</span><span class="card-action" id="right-action">Choose this joke</span></button>
+      </div>
+      <div class="status-area"><p id="battle-status" role="status" aria-live="polite"></p><button id="next-pair" class="secondary" hidden>Next pair</button><button id="retry" class="secondary" hidden>Try again</button><button id="see-results" class="secondary" hidden>See leaderboard</button></div>
+      <p class="fine-print">Choose a joke to reveal both models. Then select Next pair to continue. Each pair appears once per browser session.</p>
+    </section>
+    <section id="leaderboard-view" aria-labelledby="leaderboard-title" hidden>
+      <div class="intro"><p class="eyebrow">THE RESULTS</p><h1 id="leaderboard-title">Who gets the laughs?</h1><p>Model rankings from your saved, head-to-head votes.</p></div>
+      <div class="board-summary"><span><strong id="vote-count">—</strong> saved votes</span><span><strong id="pair-count">—</strong> pairs in the pool</span><span><strong id="word-count">—</strong> prompt words</span><button id="refresh-results" class="secondary">Refresh results</button></div>
+      <p id="leaderboard-status" role="status" aria-live="polite"></p>
+      <div class="table-wrap"><table><caption class="sr-only">Models ranked by win rate. Models without votes are unranked.</caption><thead><tr><th scope="col">Rank</th><th scope="col">Model</th><th scope="col">Reasoning</th><th scope="col">Win rate</th><th scope="col">Wins</th><th scope="col">Losses</th><th scope="col">Comparisons</th><th scope="col">Unique jokes</th></tr></thead><tbody id="rankings"></tbody></table></div>
+      <details class="pool-details"><summary>Explore the word bucket and model availability</summary><p id="word-list"></p><p id="unavailable-models"></p><p id="model-notes"></p></details>
+      <aside class="method"><h2>How the leaderboard works</h2><p>Each choice gives one model a win and the other a loss. Win rate is wins divided by comparisons. Models with the same win rate share a rank.</p><p id="sample-note">A small joke pool gives a limited view of humor. Rankings can change as more votes arrive.</p><p>Votes are anonymous browser sessions, not verified unique people. This is an early preference sample, not a scientific benchmark.</p></aside>
+      <p class="fine-print">This pool uses lower reasoning for faster generation. Reasoning is off where supported; other models use their lowest supported effort. These settings differ from the supplied benchmark chart.</p>
+    </section>
+  </main>
+  <footer><span>Jokes Arena</span><span>Real model jokes. Human judgment.</span></footer>
+</body>
+</html>

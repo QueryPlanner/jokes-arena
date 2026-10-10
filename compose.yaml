@@ -1,0 +1,31 @@
+services:
+  arena:
+    image: ${ARENA_IMAGE:?Set an immutable image digest}
+    user: "${ARENA_UID:?Set the host user UID}:${ARENA_GID:?Set the host group GID}"
+    ports:
+      - "127.0.0.1:8183:8080"
+    environment:
+      ARENA_ORIGIN: https://jokesarena.lordpatil.com
+      ARENA_DATABASE: /data/arena.db
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 256m
+    cpus: 0.5
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/ready', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
